@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Post, Vote } = require('../../models');
 
 // GET /api/users
 router.get('/', (req, res) => {
     // Access our USER model and run .findAll() method
     User.findAll({
-        attributes: { exclude: ['password']}
+        attributes: { exclude: ['password'] }
     })
         .then(dbUserData => res.json(dbUserData))
         .catch(err => {
@@ -17,7 +17,21 @@ router.get('/', (req, res) => {
 // GET /api/users/1
 router.get('/:id', (req, res) => {
     User.findOne({
-        attributes: { exclude: ['password'] },
+        attributes: {
+            exclude: ['password'],
+        },
+        include: [
+            {
+                model: Post,
+                attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            {
+                model: Post,
+                attributes: ['title'],
+                through: Vote,
+                as: 'voted_posts'
+            }
+        ],
         where: {
             id: req.params.id
         }
@@ -61,7 +75,7 @@ router.put('/:id', (req, res) => {
         }
     })
         .then(dbUserData => {
-            if(!dbUserData[0]) {
+            if (!dbUserData[0]) {
                 res.status(404).json({ message: 'No user found with this id' });
                 return;
             }
@@ -82,7 +96,7 @@ router.delete('/:id', (req, res) => {
     })
         .then(dbUserData => {
             if (!dbUserData) {
-                res.status(404).json({ message: 'No user found with this id'});
+                res.status(404).json({ message: 'No user found with this id' });
                 return;
             }
             res.json(dbUserData);

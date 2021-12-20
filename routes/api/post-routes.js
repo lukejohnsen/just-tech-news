@@ -1,11 +1,10 @@
 const router = require('express').Router();
-const { Post, User, Vote } = require('../../models');
 const sequelize = require('../../config/connection');
+const { Post, User, Vote } = require('../../models');
 
-
-// get all posts
+// get all users
 router.get('/', (req, res) => {
-    console.log('===================');
+    console.log('======================');
     Post.findAll({
         attributes: [
             'id',
@@ -29,7 +28,6 @@ router.get('/', (req, res) => {
         });
 });
 
-// get one post
 router.get('/:id', (req, res) => {
     Post.findOne({
         where: {
@@ -51,7 +49,7 @@ router.get('/:id', (req, res) => {
     })
         .then(dbPostData => {
             if (!dbPostData) {
-                res.status(404).json({ message: 'No post found with this id!' });
+                res.status(404).json({ message: 'No post found with this id' });
                 return;
             }
             res.json(dbPostData);
@@ -63,6 +61,7 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    // expects {title: 'Taskmaster goes public!', post_url: 'https://taskmaster.com/press', user_id: 1}
     Post.create({
         title: req.body.title,
         post_url: req.body.post_url,
@@ -98,7 +97,7 @@ router.put('/:id', (req, res) => {
     )
         .then(dbPostData => {
             if (!dbPostData) {
-                res.status(404).json({ message: 'No post found with this id!' });
+                res.status(404).json({ message: 'No post found with this id' });
                 return;
             }
             res.json(dbPostData);
